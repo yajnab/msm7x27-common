@@ -1,39 +1,23 @@
-LOCAL_PATH := $(call my-dir)
+LOCAL_PATH:= $(call my-dir)
 
 include $(CLEAR_VARS)
+
+LOCAL_CFLAGS 	    += -DANDROID_JB=1 
+##Uncomment previous line in JB build
+
+LOCAL_CFLAGS        += -O3
+LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
+LOCAL_MODULE := camera.$(TARGET_DEVICE)
 
 LOCAL_MODULE_TAGS := optional
-LOCAL_PRELINK_MODULE := false
-LOCAL_SRC_FILES := QualcommCameraHardware.cpp
-LOCAL_CFLAGS := -DDLOPEN_LIBMMCAMERA=1
 
-LOCAL_CFLAGS += -DNUM_PREVIEW_BUFFERS=2 -D_ANDROID_
+LOCAL_SRC_FILES := cameraHAL.cpp
+LOCAL_C_INCLUDES := $(TOP)/frameworks/base/include
+LOCAL_C_INCLUDES       += hardware/qcom/display/libgralloc
 
-ifeq ($(BOARD_CAMERA_5MP),true)
-	LOCAL_CFLAGS += -DBOARD_CAMERA_5MP
-endif
+LOCAL_SHARED_LIBRARIES := liblog libutils libcutils
+LOCAL_SHARED_LIBRARIES += libui libhardware libcamera_client
 
-LOCAL_C_INCLUDES += \
-    $(TARGET_OUT_HEADERS)/mm-camera \
-    $(TARGET_OUT_HEADERS)/mm-still/jpeg
-
-LOCAL_SHARED_LIBRARIES := libutils libui libcamera_client liblog libcutils libbinder libdl
-
-LOCAL_MODULE := libcamera
-include $(BUILD_SHARED_LIBRARY)
-
-include $(CLEAR_VARS)
-
-LOCAL_C_FLAGS        += -O3
-LOCAL_SRC_FILES      := cameraHal.cpp
-LOCAL_MODULE_TAGS    := optional
-LOCAL_MODULE_PATH    := $(TARGET_OUT_SHARED_LIBRARIES)/hw
-LOCAL_MODULE         := camera.$(TARGET_DEVICE)
-
-LOCAL_PRELINK_MODULE := false
-
-LOCAL_SHARED_LIBRARIES := liblog libdl libutils libcamera_client libbinder libcutils libhardware libcamera libui
-LOCAL_C_INCLUDES       := frameworks/av/include frameworks/base/include frameworks/native/include
-LOCAL_C_INCLUDES       += hardware/libhardware/include/ hardware
+LOCAL_LDFLAGS	       += -L$(LOCAL_PATH) -lcamera
 
 include $(BUILD_SHARED_LIBRARY)
